@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>NinjaMan</title>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		.wall {
+			background-color: blue;
+			height: 40px;
+			width: 40px;
+			display: inline-block;
+		}
+		.row {
+			line-height: 0;
+		}
+		.sushi {
+			background-color: black;
+			height: 40px;
+			width: 40px;
+			display: inline-block;
+			background-image: url(sushi.png);
+			background-size: contain;
+		}
+		.onigiri {
+			background-color: black;
+			height: 40px;
+			width: 40px;
+			display: inline-block;
+			background-image: url(onigiri.png);
+			background-size: contain;
+		}		
+		.blank {
+			background-color: black;
+			height: 40px;
+			width: 40px;
+			display: inline-block;
+		}
+		#ninjaman {
+			background-color: black;
+			height: 40px;
+			width: 40px;
+			display: inline-block;
+			background-image: url(ninja.gif);
+			background-size: contain;
+			position: absolute;
+			left: 40px;
+			top: 40px;
+		}
+		#ninjaman {
+			background-color: black;
+			height: 40px;
+			width: 40px;
+			display: inline-block;
+			background-image: url(ninja.gif);
+			background-size: contain;
+			position: absolute;
+			left: 40px;
+			top: 40px;
+		}
+		#pinky {
+			background-color: black;
+			height: 40px;
+			width: 40px;
+			display: inline-block;
+			background-image: url(pinky.gif);
+			background-size: contain;
+			position: absolute;
+			left: 40px;
+			top: 40px;
+		}
+	</style>
+</head>
+<body>
+	<div id='world'></div>
+	<div id='ninjaman'></div>
+	<div id='pinky'></div>
+	<div id='score'></div>
+</body>
+<script type="text/javascript">
+	var world = [
+		[1,1,1,1,1,1,1,1,1,1], // upper wall
+		// [1,0,2,2,1],
+		// [1,2,1,2,1],
+		// [1,2,2,2,1],
+		// [1,1,1,1,1],
+	];
+
+	var worldDic = {
+		0: 'blank',
+		1: 'wall',
+		2: 'sushi',
+		3: 'onigiri'
+	}
+
+	var score = 0;
+
+	function randomWorld() {
+		var x = 8; // 8 + start and end wall
+		var y = 8; // 8 + start and end wall
+
+		for (var i = 0; i < y; i++) {
+			var tempArr = [1]; // start from wall
+			
+
+			for (var j = 0; j < x; j++) {
+				tempArr.push(Math.floor(Math.random() * 4));
+			}
+			tempArr.push(1); // end with wall 
+			world.push(tempArr); 
+		}
+		world.push([1,1,1,1,1,1,1,1,1,1]) // down wall
+		world[1][1] = 0, world[1][2] = 0, world[world.length-2][1] = 0;
+	}
+	randomWorld();
+
+
+	function drawWorld() {
+
+		output = "";
+		for (var row = 0; row < world.length; row++) {
+			output += "<div class='row'>" // make <div class='row'>
+			for (var i = 0; i < world[row].length; i++) {
+				output += "<div class = '" + worldDic[world[row][i]] +"'></div>"
+				// repersent the index for each worldDic
+				// worldDic[world[row][i]] find the value for the inex
+			}
+			output += "</div>" // make </div> for row 
+		}
+
+		document.getElementById('world').innerHTML = output
+		document.getElementById('score').textContent = "Total Score: "+score;
+	}
+
+	drawWorld();
+
+	var ninjaman = { // ninjaman position
+		x: 1,
+		y: 1,
+	};
+
+	var pinky = {
+		x: 1,
+		y: 8,
+	}
+
+	function ninjamanUpdate() { // update with left / top px;
+		document.getElementById('ninjaman').style.top = ninjaman.y * 40 + "px";
+		document.getElementById('ninjaman').style.left = ninjaman.x * 40 + "px";
+	}
+
+	function pinkyUpdate() { // update with left / top px;
+		document.getElementById('pinky').style.top = pinky.y * 40 + "px";
+		document.getElementById('pinky').style.left = pinky.x * 40 + "px";
+	}
+
+
+	document.onkeydown = function(e) {
+
+		if (e.keyCode === 37 && world[ninjaman.y][ninjaman.x - 1] !== 1) { // left stop at wall -1 to left
+			ninjaman.x--;
+		} else if (e.keyCode === 39 && world[ninjaman.y][ninjaman.x + 1] !== 1) { // right stop at wall +1 to right
+			ninjaman.x++;
+		} else if (e.keyCode === 40 && world[ninjaman.y + 1][ninjaman.x] !== 1) { // down stop at wall +1 to down
+			ninjaman.y++;
+		} else if (e.keyCode === 38 && world[ninjaman.y - 1][ninjaman.x] !== 1) { // up stop at wall -1 to top
+			ninjaman.y--;
+		}
+		scoreCount();
+
+		world[ninjaman.y][ninjaman.x] = 0; // current position turn to 0: 'blank'
+		ninjamanUpdate();
+		drawWorld();
+ 	}
+
+	var pinky = {
+		x: 1,
+		y: 8,
+	} 	
+
+ 	function pinkyMove() {
+ 		// if (world[pinky.y][pinky.x - 1] !== 1) {
+ 		// 	pinky.x--;
+ 		// } else if (world[pinky.y][pinky.x + 1] !== 1) {
+ 		// 	pinky.x++;}
+ 		// } else if (world[pinky.y + 1][pinky.x] !== 1) {
+ 		// 	pinky.y++;
+ 		// } else if (world[pinky.y - 1][pinky.x] !== 1) {
+ 		// 	pinky.y--;
+ 		// }
+
+
+ 		if (world[ninjaman.y] < world[pinky.y] && world[pinky.y - 1][pinky.x] !== 1) {
+ 			pinky.y--;
+ 		}  else if (world[ninjaman.y] > world[pinky.y] && world[pinky.y + 1][pinky.x] !== 1) {
+ 			pinky.y++;
+		}
+
+		if (world[ninjaman.x] >= world[pinky.x] && world[pinky.y][pinky.x + 1] !== 1) {
+ 			pinky.x++;
+ 		} else if (world[ninjaman.x] <= world[pinky.x] && world[pinky.y][pinky.x - 1] !== 1) {
+ 			pinky.x--;
+ 		}
+		console.log(pinky);
+ 		pinkyUpdate()
+  	}
+
+ 	pinkyUpdate()
+  	setInterval(pinkyMove, 1000);
+
+
+ 	function scoreCount() {
+ 		if (world[ninjaman.y][ninjaman.x] === 2) { // current location for sushi
+				score += 10;
+			} else if (world[ninjaman.y][ninjaman.x] === 3) { // current location for onigiri
+				score += 5;
+			}
+ 	}
+
+
+</script>
+</html>
+
+
+
+
